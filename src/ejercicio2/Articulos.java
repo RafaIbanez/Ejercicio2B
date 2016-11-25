@@ -28,12 +28,14 @@ static public ResultSet r; char esNuevo = ' ';
         Connection connection = DriverManager.getConnection(url,user, pass);
         Statement s = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         // Statement s = connection.createStatement();
-        String query = "select * from articulos";
+        String query = "select articulos.*, fabricantes.NOMBRE from articulos left join fabricantes on FABRICANTE = COD_FABRICANTE";
+        //String query = "select articulos.*, fabricantes.NOMBRE from articulos, fabricantes where FABRICANTE = COD_FABRICANTE";
         r = s.executeQuery(query);
         r.first();
         cod_articulo.setText(r.getString("COD_ARTICULO"));
         articulo.setText(r.getString("ARTICULO"));
         fabricante.setText(r.getString("FABRICANTE"));
+        nombre.setText(r.getString("NOMBRE"));
         peso.setText(r.getString("PESO"));
         categoria.setText(r.getString("CATEGORIA"));
         precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -44,6 +46,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(false);
             articulo.setEditable(false);
             fabricante.setEditable(false);
+            nombre.setEditable(false);
             peso.setEditable(false);
             categoria.setEditable(false);
             precio_venta.setEditable(false);
@@ -91,6 +94,7 @@ static public ResultSet r; char esNuevo = ' ';
         BotonSalir = new javax.swing.JButton();
         BotonAceptar = new javax.swing.JButton();
         BotonCancelar = new javax.swing.JButton();
+        nombre = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("APLICACION : EJERCICIO2 (BASES)");
@@ -257,7 +261,7 @@ static public ResultSet r; char esNuevo = ' ';
                                     .addComponent(BotonCancelar)
                                     .addComponent(BotonAceptar)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(LabelPRECIO_COSTE, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -265,7 +269,9 @@ static public ResultSet r; char esNuevo = ' ';
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(LabelFABRICANTE, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(fabricante, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(fabricante, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(nombre))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(LabelPESO, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -313,7 +319,9 @@ static public ResultSet r; char esNuevo = ' ';
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(LabelFABRICANTE)
-                    .addComponent(fabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(fabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(LabelPESO)
@@ -371,6 +379,7 @@ static public ResultSet r; char esNuevo = ' ';
         cod_articulo.setText(r.getString("COD_ARTICULO"));
         articulo.setText(r.getString("ARTICULO"));
         fabricante.setText(r.getString("FABRICANTE"));
+        nombre.setText(r.getString("NOMBRE"));
         peso.setText(r.getString("PESO"));
         categoria.setText(r.getString("CATEGORIA"));
         precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -387,6 +396,7 @@ static public ResultSet r; char esNuevo = ' ';
         cod_articulo.setText(r.getString("COD_ARTICULO"));
         articulo.setText(r.getString("ARTICULO"));
         fabricante.setText(r.getString("FABRICANTE"));
+        nombre.setText(r.getString("NOMBRE"));
         peso.setText(r.getString("PESO"));
         categoria.setText(r.getString("CATEGORIA"));
         precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -403,6 +413,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setText(r.getString("COD_ARTICULO"));
             articulo.setText(r.getString("ARTICULO"));
             fabricante.setText(r.getString("FABRICANTE"));
+            nombre.setText(r.getString("NOMBRE"));
             peso.setText(r.getString("PESO"));
             categoria.setText(r.getString("CATEGORIA"));
             precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -420,6 +431,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setText(r.getString("COD_ARTICULO"));
             articulo.setText(r.getString("ARTICULO"));
             fabricante.setText(r.getString("FABRICANTE"));
+            nombre.setText(r.getString("NOMBRE"));
             peso.setText(r.getString("PESO"));
             categoria.setText(r.getString("CATEGORIA"));
             precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -457,7 +469,8 @@ static public ResultSet r; char esNuevo = ' ';
         // Limpiar la pantalla
         cod_articulo.setText(""); 
         articulo.setText(""); 
-        fabricante.setText(""); 
+        fabricante.setText("");
+        nombre.setText("");
         peso.setText("");
         categoria.setText("");
         precio_venta.setText("");
@@ -468,6 +481,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(true);
             articulo.setEditable(true);
             fabricante.setEditable(true);
+            nombre.setEditable(true);
             peso.setEditable(true);
             categoria.setEditable(true);
             precio_venta.setEditable(true);
@@ -498,6 +512,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(false);
             articulo.setEditable(true);
             fabricante.setEditable(true);
+            nombre.setEditable(true);
             peso.setEditable(true);
             categoria.setEditable(true);
             precio_venta.setEditable(true);
@@ -549,12 +564,13 @@ static public ResultSet r; char esNuevo = ' ';
         }
         // Volver a refrescar la base de datos
         if (esNuevo != 'M'){
-        String query = "select * from articulos";   
+        String query = "select articulos.*, fabricantes.NOMBRE from articulos left join fabricantes on FABRICANTE = COD_FABRICANTE";   
             r = s.executeQuery(query);
             r.first();
             cod_articulo.setText(r.getString("COD_ARTICULO"));
             articulo.setText(r.getString("ARTICULO"));
             fabricante.setText(r.getString("FABRICANTE"));
+            nombre.setText(r.getString("NOMBRE"));
             peso.setText(r.getString("PESO"));
             categoria.setText(r.getString("CATEGORIA"));
             precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -580,6 +596,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(false);
             articulo.setEditable(false);
             fabricante.setEditable(false);
+            nombre.setEditable(false);
             peso.setEditable(false);
             categoria.setEditable(false);
             precio_venta.setEditable(false);
@@ -608,6 +625,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setText(r.getString("COD_ARTICULO"));
             articulo.setText(r.getString("ARTICULO"));
             fabricante.setText(r.getString("FABRICANTE"));
+            nombre.setText(r.getString("NOMBRE"));
             peso.setText(r.getString("PESO"));
             categoria.setText(r.getString("CATEGORIA"));
             precio_venta.setText(r.getString("PRECIO_VENTA"));
@@ -620,6 +638,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(false);
             articulo.setEditable(false);
             fabricante.setEditable(false);
+            nombre.setEditable(false);
             peso.setEditable(false);
             categoria.setEditable(false);
             precio_venta.setEditable(false);
@@ -647,6 +666,7 @@ static public ResultSet r; char esNuevo = ' ';
             cod_articulo.setEditable(false);
             articulo.setEditable(false);
             fabricante.setEditable(false);
+            nombre.setEditable(false);
             peso.setEditable(false);
             categoria.setEditable(false);
             precio_venta.setEditable(false);
@@ -729,6 +749,7 @@ static public ResultSet r; char esNuevo = ' ';
     private javax.swing.JTextField cod_articulo;
     private javax.swing.JTextField existencias;
     private javax.swing.JTextField fabricante;
+    private javax.swing.JTextField nombre;
     private javax.swing.JTextField peso;
     private javax.swing.JTextField precio_coste;
     private javax.swing.JTextField precio_venta;
