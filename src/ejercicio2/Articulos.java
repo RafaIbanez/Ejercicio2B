@@ -11,13 +11,20 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.Statement;
+import javax.swing.DefaultComboBoxModel;
+
 /**
  *
  * @author ribanez
  */
 public class Articulos extends javax.swing.JFrame {
 
-static public ResultSet r; char esNuevo = ' ';
+static public ResultSet r;
+static public ResultSet r2;
+static public ResultSet r3;
+static public Connection conexion;
+
+char esNuevo = ' ';
 
     public Articulos() throws SQLException {
         initComponents();
@@ -25,37 +32,34 @@ static public ResultSet r; char esNuevo = ' ';
         String url = "jdbc:mysql://localhost:3306/bases";
         String user = "root";
         String pass = "";
-        Connection connection = DriverManager.getConnection(url,user, pass);
-        Statement s = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        // Statement s = connection.createStatement();
-        String query = "select articulos.*, fabricantes.NOMBRE from articulos left join fabricantes on FABRICANTE = COD_FABRICANTE";
-        //String query = "select articulos.*, fabricantes.NOMBRE from articulos, fabricantes where FABRICANTE = COD_FABRICANTE";
-        r = s.executeQuery(query);
-        r.first();
-        cod_articulo.setText(r.getString("COD_ARTICULO"));
-        articulo.setText(r.getString("ARTICULO"));
-        fabricante.setText(r.getString("FABRICANTE"));
-        nombre.setText(r.getString("NOMBRE"));
-        peso.setText(r.getString("PESO"));
-        categoria.setText(r.getString("CATEGORIA"));
-        precio_venta.setText(r.getString("PRECIO_VENTA"));
-        precio_coste.setText(r.getString("PRECIO_COSTE"));
-        existencias.setText(r.getString("EXISTENCIAS"));
+        conexion = DriverManager.getConnection(url,user, pass);
         
-        //Desactivar campos
-            cod_articulo.setEditable(false);
-            articulo.setEditable(false);
-            fabricante.setEditable(false);
-            nombre.setEditable(false);
-            peso.setEditable(false);
-            categoria.setEditable(false);
-            precio_venta.setEditable(false);
-            precio_coste.setEditable(false);
-            existencias.setEditable(false);        
+    // Prepara la conexion de la tabla articulos
+        Statement s = conexion.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        String query = "select articulos.*, fabricantes.NOMBRE from articulos left join fabricantes on FABRICANTE = COD_FABRICANTE";
+        r = s.executeQuery(query);
+   
+    // Saca el primer registro de articulos
+        r.first();
+            primerRegistro();
+     
+    //Desactivar campos
+        cod_articulo.setEditable(false);
+        articulo.setEditable(false);
+        fabricante.setEditable(false);
+        nombre.setEditable(false);
+        peso.setEditable(false);
+        categoria.setEditable(false);
+        precio_venta.setEditable(false);
+        precio_coste.setEditable(false);
+        existencias.setEditable(false);        
     
         this.BotonAceptar.setVisible(false);
         this.BotonCancelar.setVisible(false);
-        
+       
+        // Genera el combo del nombre de fabricante
+          comboFabricante();
+       
     }
 
     /**
@@ -95,6 +99,7 @@ static public ResultSet r; char esNuevo = ' ';
         BotonAceptar = new javax.swing.JButton();
         BotonCancelar = new javax.swing.JButton();
         nombre = new javax.swing.JTextField();
+        ComboNombre = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("APLICACION : EJERCICIO2 (BASES)");
@@ -227,6 +232,13 @@ static public ResultSet r; char esNuevo = ' ';
             }
         });
 
+        ComboNombre.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboNombreActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -256,7 +268,7 @@ static public ResultSet r; char esNuevo = ' ';
                                         .addComponent(BotonModificar)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(BotonSuprimir)))
-                                .addGap(33, 33, Short.MAX_VALUE)
+                                .addGap(47, 47, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(BotonCancelar)
                                     .addComponent(BotonAceptar)))
@@ -296,8 +308,9 @@ static public ResultSet r; char esNuevo = ' ';
                                         .addComponent(LabelEXISTENCIAS, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(existencias, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap(24, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(ComboNombre, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(BotonSalir))
@@ -321,7 +334,8 @@ static public ResultSet r; char esNuevo = ' ';
                     .addComponent(LabelFABRICANTE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(fabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ComboNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(LabelPESO)
@@ -685,11 +699,80 @@ static public ResultSet r; char esNuevo = ' ';
         // TODO add your handling code here:
     }//GEN-LAST:event_existenciasActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void ComboNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboNombreActionPerformed
+
+        //Recuperar el nombre y el codigo para presentarlo en pantalla
+  
+    }//GEN-LAST:event_ComboNombreActionPerformed
+
+// METODO PARA SACAR EL PRIMER REGISTRO#########################################
+    public void primerRegistro(){
+        try {
+            cod_articulo.setText(r.getString("COD_ARTICULO"));
+            articulo.setText(r.getString("ARTICULO"));
+            fabricante.setText(r.getString("FABRICANTE"));   //Codigo Fabricante
+            nombre.setText(r.getString("NOMBRE"));           //Nombre Fabricante
+            peso.setText(r.getString("PESO"));
+            categoria.setText(r.getString("CATEGORIA"));
+            precio_venta.setText(r.getString("PRECIO_VENTA"));
+            precio_coste.setText(r.getString("PRECIO_COSTE"));
+            existencias.setText(r.getString("EXISTENCIAS"));
+        } catch (SQLException ex) {
+            Logger.getLogger(Articulos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+// METODO PARA GENERAR EL COMBO PARA EL NOMBRE DEL FABRICANTE###################
+    public void comboFabricante(){
+        try{
+            Statement s2 = conexion.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            String query2 = "Select * from fabricantes";
+            r2 = s2.executeQuery(query2);
+            DefaultComboBoxModel value2 = new DefaultComboBoxModel();
+            while (r2.next()) {
+                value2.addElement(r2.getString("NOMBRE"));
+            }
+            ComboNombre.setModel(value2);
+            ComboNombre.setSelectedItem(nombreFabricante(r.getInt("NOMBRE")));
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Articulos.class.getName()).log(Level.SEVERE, null, ex);
+        }    
+    }
+    
+// METODO PARA RECUPERAR EL NOMBRE DEL FABRICANTE ##############################
+    public static String nombreFabricante(int codigo){
+        String nombre = "";
+        try {
+            Statement s3 = conexion.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            String query3= "select NOMBRE from fabricantes where COD_FABRICANTE=" + codigo;
+            r3 = s3.executeQuery(query3);
+            r3.first();
+            nombre = r3.getString("NOMBRE");
+        } catch (SQLException ex) {
+            Logger.getLogger(Articulos.class.getName()).log(Level.SEVERE, null, ex);
+        }   
+    return nombre;
+    }
+    
+// METODO PARA RECUPERAR EL CODIGO DEL FABRICANTE###############################    
+    public static int codigoFabricante(String nombre){
+        int codigo = 0;
+        try {
+            Statement s3 = conexion.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            String query3= "select COD_FABRICANTE from fabricantes where NOMBRE=" + nombre;
+            r3 = s3.executeQuery(query3);
+            r3.first();
+            codigo = r3.getInt("COD_FABRICANTE");
+        } catch (SQLException ex) {
+            Logger.getLogger(Articulos.class.getName()).log(Level.SEVERE, null, ex);
+        }   
+    return codigo;
+    }
+    
+// METODO MAIN##################################################################
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+    /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -712,7 +795,7 @@ static public ResultSet r; char esNuevo = ' ';
         }
         //</editor-fold>
 
-        /* Create and display the form */
+    /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -735,6 +818,7 @@ static public ResultSet r; char esNuevo = ' ';
     private javax.swing.JButton BotonSiguiente;
     private javax.swing.JButton BotonSuprimir;
     private javax.swing.JButton BotonUltimo;
+    private javax.swing.JComboBox<String> ComboNombre;
     private javax.swing.JLabel LabelARTICULO;
     private javax.swing.JLabel LabelCATEGORIA;
     private javax.swing.JLabel LabelCOD_ARTICULO;
